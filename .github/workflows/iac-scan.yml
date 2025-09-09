@@ -50,16 +50,6 @@ jobs:
           mkdir -p reports
           lacework iac scan \
             --directory infra \
-            --format sarif \
-            > reports/lacework-results.sarif
-
-
-
-      - name: Upload SARIF to GitHub Security
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: reports/lacework-results.sarif
 
       - name: Show summary
         if: always()
