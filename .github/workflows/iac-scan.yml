@@ -29,9 +29,6 @@ jobs:
           curl https://raw.githubusercontent.com/lacework/go-sdk/main/cli/install.sh | bash
           echo "$HOME/.lacework/bin" >> $GITHUB_PATH
 
-      - name: Install IaC component
-        run: lacework component install iac
-
       - name: Configure Lacework CLI
         env:
           LW_ACCOUNT_NAME: ${{ secrets.LW_ACCOUNT_NAME }}
@@ -43,6 +40,9 @@ jobs:
             -k "$LW_API_KEY" \
             -s "$LW_API_SECRET" \
             --noninteractive
+
+      - name: Install IaC component
+        run: lacework component install iac
 
       - name: Scan IaC (fail on High/Critical)
         id: scan
