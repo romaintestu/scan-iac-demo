@@ -49,9 +49,8 @@ jobs:
         run: |
           mkdir -p reports
           lacework iac scan \
-            --path infra \
+            --directory infra \
             --format sarif \
-            --severity-threshold high \
             > reports/lacework-results.sarif
 
 
