@@ -1,71 +1,68 @@
 name: iac-scan
-- '.github/workflows/iac-scan.yml'
-push:
-branches: [ main ]
-paths:
-- 'infra/**'
-- '.github/workflows/iac-scan.yml'
 
+on:
+  pull_request:
+    paths:
+      - 'infra/**'
+      - '.github/workflows/iac-scan.yml'
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'infra/**'
+      - '.github/workflows/iac-scan.yml'
 
 permissions:
-contents: read
-security-events: write
-
+  contents: read
+  security-events: write
 
 jobs:
-scan:
-runs-on: ubuntu-latest
-steps:
-- name: Checkout
-uses: actions/checkout@v4
-with:
-fetch-depth: 0
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      - name: Install Lacework CLI
+        run: |
+          curl -sSL https://get.lacework.net/cli | bash
+          echo "$HOME/.lacework/bin" >> $GITHUB_PATH
 
-- name: Install Lacework CLI
-run: |
-curl -sSL https://get.lacework.net/cli | bash
-echo "$HOME/.lacework/bin" >> $GITHUB_PATH
+      - name: Install IaC component
+        run: lacework component install iac
 
+      - name: Configure Lacework CLI
+        env:
+          LW_ACCOUNT_NAME: ${{ secrets.LW_ACCOUNT_NAME }}
+          LW_API_KEY: ${{ secrets.LW_API_KEY }}
+          LW_API_SECRET: ${{ secrets.LW_API_SECRET }}
+        run: |
+          lacework configure \
+            -a "$LW_ACCOUNT_NAME" \
+            -k "$LW_API_KEY" \
+            -s "$LW_API_SECRET" \
+            --noninteractive
 
-- name: Install IaC component
-run: lacework component install iac
+      - name: Scan IaC (fail on High/Critical)
+        id: scan
+        run: |
+          mkdir -p reports
+          lacework iac scan \
+            --path infra \
+            --format sarif \
+            --severity-threshold high \
+            --fail-on-policy \
+            > reports/lacework-results.sarif
 
+      - name: Upload SARIF to GitHub Security
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: reports/lacework-results.sarif
 
-- name: Configure Lacework CLI
-env:
-LW_ACCOUNT_NAME: ${{ secrets.LW_ACCOUNT_NAME }}
-LW_API_KEY: ${{ secrets.LW_API_KEY }}
-LW_API_SECRET: ${{ secrets.LW_API_SECRET }}
-run: |
-lacework configure \
--a "$LW_ACCOUNT_NAME" \
--k "$LW_API_KEY" \
--s "$LW_API_SECRET" \
---noninteractive
-
-
-- name: Scan IaC (fail on High/Critical)
-id: scan
-run: |
-# Full repo scan within infra/ (fast enough for most repos)
-mkdir -p reports
-lacework iac scan \
---path infra \
---format sarif \
---severity-threshold high \
---fail-on-policy \
-> reports/lacework-results.sarif
-
-
-- name: Upload SARIF to GitHub Security
-uses: github/codeql-action/upload-sarif@v3
-with:
-sarif_file: reports/lacework-results.sarif
-
-
-- name: Show summary
-if: always()
-run: |
-echo "## Lacework IaC Scan" >> $GITHUB_STEP_SUMMARY
-echo "Results uploaded as SARIF. Threshold: High." >> $GITHUB_STEP_SUMMARY
+      - name: Show summary
+        if: always()
+        run: |
+          echo "## Lacework IaC Scan" >> $GITHUB_STEP_SUMMARY
+          echo "Results uploaded as SARIF. Threshold: High." >> $GITHUB_STEP_SUMMARY
