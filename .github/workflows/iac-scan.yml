@@ -44,16 +44,17 @@ jobs:
       - name: Install IaC component
         run: lacework component install iac
 
-      - name: Scan IaC (fail on High/Critical)
-        id: scan
+      - name: Scan IaC (fail on High/Critical + log)
         run: |
+          set -o pipefail
           mkdir -p reports
           lacework iac scan \
             --path infra \
             --format sarif \
             --severity-threshold high \
             --fail-on-policy \
-            > reports/lacework-results.sarif
+            | tee reports/lacework-results.sarif
+
 
       - name: Upload SARIF to GitHub Security
         if: always()
