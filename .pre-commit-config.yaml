@@ -1,0 +1,8 @@
+repos:
+- repo: local
+hooks:
+- id: lacework-iac-scan
+name: Lacework IaC scan (staged files)
+entry: bash scripts/precommit_iac_scan.sh
+language: system
+pass_filenames: false

@@ -1,0 +1,2 @@
+# Require security/platform reviews on infra changes
+infra/* @your-org/security-team @your-org/platform-team

@@ -1,0 +1,4 @@
+# Optional local config hints. CLI flags take precedence.
+# Use Lacework UI/policies for centralized exceptions where possible.
+version: 1
+notes: "Local hints/example only; adjust per your org."
