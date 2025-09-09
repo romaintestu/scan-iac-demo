@@ -26,7 +26,7 @@ jobs:
 
       - name: Install Lacework CLI
         run: |
-          curl -sSL https://get.lacework.net/cli | bash
+          curl https://raw.githubusercontent.com/lacework/go-sdk/main/cli/install.sh | bash
           echo "$HOME/.lacework/bin" >> $GITHUB_PATH
 
       - name: Install IaC component
