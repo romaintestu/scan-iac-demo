@@ -48,7 +48,7 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p reports
-          lacework iac scan \
+          lacework iac scan --upload \
             --directory infra \
 
       - name: Show summary
