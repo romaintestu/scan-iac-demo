@@ -7,7 +7,7 @@ This repo demonstrates how to run **Lacework IaC scanning** in GitHub Actions an
 
 
 ## What you get
-- ✅ GitHub Actions workflow scanning Terraform/K8s on PR & push
+- ✅ GitHub Actions workflow scanning Terraform/K8s on PR & push.
 - ✅ Build fails on **High/Critical** by default (`--fail-on-policy`)
 - ✅ SARIF results uploaded to the Security tab
 - ✅ (Optional) pre-commit hook to catch issues locally
