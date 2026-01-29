@@ -24,7 +24,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Lacework CLI
+      - name: Install Lacework CLI TEST
         run: |
           curl https://raw.githubusercontent.com/lacework/go-sdk/main/cli/install.sh | bash
           echo "$HOME/.lacework/bin" >> $GITHUB_PATH
